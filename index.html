@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PB ThreeJS Game</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        const tableGeometry = new THREE.PlaneGeometry(10, 10);
+        const tableMaterial = new THREE.MeshBasicMaterial({color: 0x996633});
+        const table = new THREE.Mesh(tableGeometry, tableMaterial);
+        table.rotation.x = -Math.PI / 2;
+        scene.add(table);
+
+        const plateGeometry = new THREE.CylinderGeometry(1.5, 1.5, 0.1, 32);
+        const plateMaterial = new THREE.MeshBasicMaterial({color: 0xffffff});
+        const plate = new THREE.Mesh(plateGeometry, plateMaterial);
+        plate.position.set(2.5, 0.3, -2);
+        plate.rotation.y = Math.PI / 4;
+        scene.add(plate);
+
+        function createClickableObject(geometry, material, position, onClick) {
+            const object = new THREE.Mesh(geometry, material);
+            object.position.copy(position);
+            object.onClick = onClick;
+            scene.add(object);
+            return object;
+        }
+
+        const breadTexture = new THREE.TextureLoader().load('https://t4.ftcdn.net/jpg/00/40/52/45/360_F_40524560_yTpTQxidzZior4laEOc4p3EHbXbgN4JB.jpg');
+        const breadMaterial = new THREE.MeshBasicMaterial({map: breadTexture});
+
+        const breadGeometry = new THREE.BoxGeometry(1, 0.1, 1);
+        let breadCount = 0;
+
+        function moveObjectToPlate(object) {
+            breadCount++;
+            if (breadCount === 1) {
+                object.position.set(0, 0.2, 0);
+            } else if (breadCount === 2) {
+                object.position.set(0, 0.4, 0);
+            }
+            plate.add(object);
+        }
+
+        // Jar texture
+        const jarTexture = new THREE.TextureLoader().load('https://media.discordapp.net/attachments/1165970079041728574/1230908815659106325/fashoom.jpg?ex=6635082a&is=6622932a&hm=4e097a817cc56c1c153a83ae28ed5c77a12d78163929cfe10af9a1076e12d88b&=&format=webp&width=495&height=495');
+
+        // Combine texture and color materials for the jar
+        const jarMaterial = new THREE.MeshBasicMaterial({map: jarTexture});
+
+        const peanutButterGeometry = new THREE.CylinderGeometry(0.5, 0.5, 2, 32);
+        const peanutButter = createClickableObject(peanutButterGeometry, jarMaterial, new THREE.Vector3(0, 0.5, 2), () => {
+            addPeanutButterLayer();
+        });
+
+        const pbTexture = new THREE.TextureLoader().load('https://media.discordapp.net/attachments/1165970079041728574/1230909683477516418/v1303616_prozis_creamy-peanut-butter-250-g_2.png?ex=663508f9&is=662293f9&hm=f21c1dedd28623c104b58b2c9073f639c240d3a268474a1b94cd92ec01048a47&=&format=webp&quality=lossless&width=350&height=350');
+
+        function addPeanutButterLayer() {
+            const peanutButterLayerGeometry = new THREE.BoxGeometry(1, 0.1, 1);
+            const peanutButterLayerMaterial = new THREE.MeshBasicMaterial({map: pbTexture});
+            const peanutButterLayer = new THREE.Mesh(peanutButterLayerGeometry, peanutButterLayerMaterial);
+            peanutButterLayer.position.set(0, 0.3, 0);
+            plate.add(peanutButterLayer);
+            secondBreadSliceAllowed = true;
+        }
+
+        let secondBreadSliceAllowed = false;
+
+        const bread1 = createClickableObject(breadGeometry, breadMaterial, new THREE.Vector3(-1, 0.1, 0), () => {
+            moveObjectToPlate(bread1);
+        });
+
+        const bread2 = createClickableObject(breadGeometry, breadMaterial, new THREE.Vector3(1, 0.1, 0), () => {
+            if (secondBreadSliceAllowed) {
+                moveObjectToPlate(bread2);
+            }
+        });
+
+        camera.position.set(0, 5, 5);
+        camera.lookAt(0, 0, 0);
+
+        document.addEventListener('click', onMouseClick, false);
+
+        function onMouseClick(event) {
+            const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera({x: mouseX, y: mouseY}, camera);
+
+            const intersects = raycaster.intersectObjects(scene.children);
+
+            if (intersects.length > 0) {
+                const object = intersects[0].object;
+                if (object.onClick) {
+                    object.onClick();
+                }
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>
