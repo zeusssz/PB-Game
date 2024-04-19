@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>PB ThreeJS Game</title>
     <style>
+        /* almost no css 💀*/
         body {
             margin: 0;
             overflow: hidden;
@@ -11,11 +12,52 @@
         canvas {
             display: block;
         }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 5;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 20% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            text-align: center;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
+        <div id="winmodal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>WAW! YOU WIN!</h2>
+            <p>Now lemme in pls 🥺</p>
+        </div>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
+        // bad code starts
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer();
@@ -59,19 +101,21 @@
             plate.add(object);
         }
 
-        // Jar texture
+        // jar texture
         const jarTexture = new THREE.TextureLoader().load('https://media.discordapp.net/attachments/1165970079041728574/1230908815659106325/fashoom.jpg?ex=6635082a&is=6622932a&hm=4e097a817cc56c1c153a83ae28ed5c77a12d78163929cfe10af9a1076e12d88b&=&format=webp&width=495&height=495');
 
-        // Combine texture and color materials for the jar
+        // mixing texture and color materials for the jar. aka mcdonalds combo meal
         const jarMaterial = new THREE.MeshBasicMaterial({map: jarTexture});
 
         const peanutButterGeometry = new THREE.CylinderGeometry(0.5, 0.5, 2, 32);
         const peanutButter = createClickableObject(peanutButterGeometry, jarMaterial, new THREE.Vector3(0, 0.5, 2), () => {
             addPeanutButterLayer();
         });
-
+        
+        // peanut buttah. aka project butter. aka project beta. aka let me in pls 🥺
         const pbTexture = new THREE.TextureLoader().load('https://media.discordapp.net/attachments/1165970079041728574/1230909683477516418/v1303616_prozis_creamy-peanut-butter-250-g_2.png?ex=663508f9&is=662293f9&hm=f21c1dedd28623c104b58b2c9073f639c240d3a268474a1b94cd92ec01048a47&=&format=webp&quality=lossless&width=350&height=350');
 
+        // ancient scrolls or some stuff idk
         function addPeanutButterLayer() {
             const peanutButterLayerGeometry = new THREE.BoxGeometry(1, 0.1, 1);
             const peanutButterLayerMaterial = new THREE.MeshBasicMaterial({map: pbTexture});
@@ -80,7 +124,7 @@
             plate.add(peanutButterLayer);
             secondBreadSliceAllowed = true;
         }
-
+    // cant let minecraft tree happen >:(
         let secondBreadSliceAllowed = false;
 
         const bread1 = createClickableObject(breadGeometry, breadMaterial, new THREE.Vector3(-1, 0.1, 0), () => {
@@ -92,7 +136,8 @@
                 moveObjectToPlate(bread2);
             }
         });
-
+        
+        // gives you hands
         camera.position.set(0, 5, 5);
         camera.lookAt(0, 0, 0);
 
@@ -120,6 +165,10 @@
             renderer.render(scene, camera);
         }
         animate();
+
+        console.log('no idea why youre looking in console tho')
+    // ill add stuff to make u win later ig
+        // bad code ends
     </script>
 </body>
 </html>
